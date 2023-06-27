@@ -2,11 +2,11 @@
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
-namespace EndpointProviders;
+namespace EndpointProviders.Interfaces;
 
 public interface IEndpointProvider
 {
     // IEndpointRouteBuilder AddEndpoints(IEndpointRouteBuilder app);
     WebApplication AddEndpoints(WebApplication app);
-   // IServiceProvider ImplementServices(IServiceProvider provider);
+    // IServiceProvider ImplementServices(IServiceProvider provider);
 }

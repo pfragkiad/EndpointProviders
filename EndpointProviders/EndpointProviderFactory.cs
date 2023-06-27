@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using EndpointProviders.Interfaces;
 
 namespace EndpointProviders;
 
@@ -10,7 +11,7 @@ namespace EndpointProviders;
   </ItemGroup>
  */
 
-public class EndpointProviderFactory
+public class EndpointProviderFactory : IEndpointProviderFactory
 {
     private readonly IServiceProvider _provider;
 
@@ -20,12 +21,12 @@ public class EndpointProviderFactory
     }
 
     public IEndpointProvider? GetEndpointProvider<T>() where T : class, IEndpointProvider
-        =>GetEndpointProvider(typeof(T));
+        => GetEndpointProvider(typeof(T));
 
     public IEndpointProvider? GetEndpointProvider(Type t)
     {
         ConstructorInfo? constructor = t.GetConstructor(new Type[] { typeof(IServiceProvider) });
         return constructor?.Invoke(new[] { _provider }) as IEndpointProvider;
     }
- 
+
 }

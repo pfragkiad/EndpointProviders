@@ -1,19 +1,20 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using EndpointProviders.Interfaces;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace EndpointProviders;
 
 public static class EndpointProviderScanner
 {
-    private static IServiceScope? currentScope;
+    private static IServiceScope? _currentScope;
 
     public static WebApplication AddEndpointsFromEndpointProviders(this WebApplication app, params Type[] assemblyMarkers)
     {
-        currentScope ??= app.Services.CreateScope();
+        _currentScope ??= app.Services.CreateScope();
 
-        var services = currentScope.ServiceProvider;
+        var services = _currentScope.ServiceProvider;
 
-        EndpointProviderFactory factory = services.GetRequiredService<EndpointProviderFactory>();
+        var factory = services.GetRequiredService<IEndpointProviderFactory>();
 
         List<IEndpointProvider> endpointsProviders = new();
 
