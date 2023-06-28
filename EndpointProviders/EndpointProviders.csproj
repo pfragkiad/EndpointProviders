@@ -5,11 +5,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>1.0.2</Version>
+    <Version>1.0.5</Version>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <Company>Pavlos Fragkiadoulakis</Company>
-    <Description>A modern way to add Dependency Injection used for Minimal API apps.</Description>
+    <Description>A modern way to add Dependency Injection used for Minimal API apps. See README.</Description>
     <Copyright>(c) 2023 Paulus Stuff</Copyright>
     <PackageTags>minimal api;di;dependency injection;endpoints</PackageTags>
   </PropertyGroup>
