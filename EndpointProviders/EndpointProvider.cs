@@ -13,6 +13,17 @@ public abstract class EndpointProvider : IEndpointProvider
         _provider = provider;
     }
 
+    public EndpointProvider() { }
+
+
+    public IServiceProvider? Provider
+    {
+        get => _provider; set
+        {
+            _provider = value;
+        }
+    }
+
     public abstract WebApplication AddEndpoints(WebApplication app);
 
     //public virtual IServiceProvider ImplementServices(IServiceProvider provider)

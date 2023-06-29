@@ -20,7 +20,7 @@ public class SampleWithEndPoints : IMarker
 	//c'mon it's not practical to add Dependency Injection for each method
 	//wouldn't it be nice if we added the IRepository repo in the constructor of the class and make all these handlers not static?
 
-	public static IResult Handler1(IRepository repo, int id) => {...}
+	public static IResult Handler1(IRepository repo, int id) => {... _repo.DoSth(id); ...}
 	
 	public static IResult Handler2(IRepository repo, int id) => {...}
 
@@ -55,16 +55,16 @@ dotnet add package EndpointsProviders
 
 ### How to use
 
-For this library, each class the instance of which we want to add endpoints, should derive the `EndpointProvider` abstract class. The `EndpointProvider` inherits the `IEndpointProvider` interface.
-Each class that derives from `EndpointProvider` should override the `AddEndpoints` method
-The above example should now be written as:
+For this library, each class the instance of which we want to add endpoints, should derive from the `EndpointProvider` abstract class. The `EndpointProvider` inherits the `IEndpointProvider` interface.
+Each class that derives from `EndpointProvider` should override the `AddEndpoints` method. The above example should now be written as:
 
 ```cs
 public class SampleWithEndPoints : EndpointProvider
 {
 	readonly IRepository _repo;
 
-	//Each EndpointProvider should have exactly the constructor below. The provider can then be used to create other instances via Dependency Injection in the constructor.
+	//Each EndpointProvider should have the constructor below.
+	//The provider can then be used to create other instances via Dependency Injection in the constructor.
 	public SampleWithEndPoints(IServiceProvider provider) : base(provider)
 	{
 		repo = provider.GetService<IRepository>();
@@ -80,10 +80,10 @@ public class SampleWithEndPoints : EndpointProvider
 		return app;
     }
 
-	//we can now use every instance that we created, without having to inject for each handler the IRepository! 
-	//and the handlers are not static now!
+	//we can now use every instance that we created, without having to inject the IRepository for each handler! 
+	//and the handlers are not static
 
-	public IResult Handler1(int id) => { ...	_repo.DoSth(id); ...}
+	public IResult Handler1(int id) => { ... _repo.DoSth(id); ...}
 	
 	public IResult Handler2(int id) => {...}
 
@@ -91,7 +91,7 @@ public class SampleWithEndPoints : EndpointProvider
 }
 ```
 
-To add all endpoints from classes with the `IEndpointProvider` interface, we should use 2 methods as shown below:
+To add all endpoints from classes with the `IEndpointProvider` interface, we should use the `AddEndPointProviderFactory` before building the app, and the `AddEndpointsFromEndpointProviders` after building the app:
 
 ```cs
 using EndpointProviders;
@@ -99,16 +99,19 @@ using EndpointProviders;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args); 
 
-builder.AddEndpointProviderFactory(); //1st method: call before building the app
+//1st method: call before building the app
+builder.AddEndpointProviderFactory(); 
 ...
 WebApplication app = builder.Build();
 
 //this adds the endpoints - the application must be first build
 //the method gets as inputs any class that can identify its parent Assembly
 //in the example below, the MarkerClass identifies the assembly
-app.AddEndpointsFromEndpointProviders(typeof(MarkerClass)); //2nd method: call after building the app. That's it!
+
+//2nd method: call after building the app. That's it!
+app.AddEndpointsFromEndpointProviders(typeof(MarkerClass));
 ```
 
-The `AndEndpointProviderFactory` method is reponsible for the services registration and passing each `IServiceProvider` to each `EndpointProvider` class constructor.
-The final method `AddEndpointsFromEndpointProviders` is the method that finally adds the endpoints to the current Web API app.
+The `AndEndpointProviderFactory` method is responsible for the insertion of the endpoints.
+The `AddEndpointsFromEndpointProviders` method collects and initializes all `IEndPointProvider` objects by passing the `IServiceProvider` to their constructor.
 
