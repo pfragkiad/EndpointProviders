@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>1.0.6</Version>
+    <Version>1.0.8</Version>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <Company>Pavlos Fragkiadoulakis</Company>
@@ -15,6 +15,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CsvReaderAdvanced" Version="1.1.12" />
+    <PackageReference Include="FluentValidation" Version="11.6.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>

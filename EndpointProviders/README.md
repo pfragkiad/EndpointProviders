@@ -100,7 +100,7 @@ using EndpointProviders;
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args); 
 
 //1st method: call before building the app
-builder.AddEndpointProviderFactory(); 
+builder.Services.AddEndpointProviderFactory(); 
 ...
 WebApplication app = builder.Build();
 
@@ -114,4 +114,89 @@ app.AddEndpointsFromEndpointProviders(typeof(MarkerClass));
 
 The `AndEndpointProviderFactory` method is responsible for the insertion of the endpoints.
 The `AddEndpointsFromEndpointProviders` method collects and initializes all `IEndPointProvider` objects by passing the `IServiceProvider` to their constructor.
+
+## Example 1 - Simple example
+
+Let's modify the classic `WeatherForecast` sample Minimal API project, in order to show an explicit example.
+
+We slightly modify the `WeatherForecast` class to a struct as shown below (there is no specific reason for that, just my preference):
+
+```cs
+namespace EndpointProviderTests;
+
+public readonly struct WeatherForecast
+{
+    public DateOnly Date { get; init; }
+
+    public int TemperatureC { get; init; }
+
+    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+
+    public string? Summary { get; init; }
+}
+```
+
+Let's build now a repository that retrieves `WeatherForecast` instances:
+
+```cs
+namespace EndpointProviderTests;
+
+public class WeatherForecastRepository
+{
+    string[] _summaries = new[] {
+            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
+    };
+
+    public List<WeatherForecast> GetNext(int count) =>
+        Enumerable.
+            Range(1, count).
+            Select(index =>
+                new WeatherForecast
+                {
+                    Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
+                    TemperatureC = Random.Shared.Next(-20, 55),
+                    Summary = _summaries[Random.Shared.Next(_summaries.Length)]
+                }).
+            ToList();
+}
+```
+
+Now, let's add the `EndpointProvider` that will contain the endpoints to be added to the web app. Note that we add the constructor that accepts a `IServiceProvider` argument.
+Via the passed provider we inject the repository, which is then used in common from any handler (ok, we have just one in this case).
+
+```cs
+using EndpointProviders;
+
+namespace EndpointProviderTests;
+
+public class WeatherForecastEndpoints : EndpointProvider
+{
+    readonly WeatherForecastRepository _repo;
+
+    public WeatherForecastEndpoints(IServiceProvider provider)
+    {
+        _repo = provider.GetRequiredService<WeatherForecastRepository>();
+    }
+
+    public override WebApplication AddEndpoints(WebApplication app)
+    {
+        app.MapGet("/weatherforecast", ForecastHandler)
+        .WithName("GetWeatherForecast")
+        .WithOpenApi();
+
+        return app;
+    }
+
+    //not that we do not need to pass the repo here
+    IResult ForecastHandler(int count)
+    {
+        if (count <= 0)
+            return Results.BadRequest();
+
+        //we use the repository here to get the forecasts
+        var next = _repo.GetNext(count);
+        return Results.Ok(next);
+    }
+}
+```
 
