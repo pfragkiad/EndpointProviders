@@ -1,23 +1,25 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>1.0.8</Version>
+    <Version>1.2.3</Version>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <Company>Pavlos Fragkiadoulakis</Company>
     <Description>A modern way to add Dependency Injection used for Minimal API apps. See README.</Description>
-    <Copyright>(c) 2023 Paulus Stuff</Copyright>
+    <Copyright>(c) 2023-2024 Paulus Stuff</Copyright>
     <PackageTags>minimal api;di;dependency injection;endpoints</PackageTags>
+    <AssemblyVersion>1.2.3</AssemblyVersion>
+    <FileVersion>1.2.3</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CsvReaderAdvanced" Version="1.1.12" />
-    <PackageReference Include="FluentValidation" Version="11.6.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
+    <PackageReference Include="CsvReaderAdvanced" Version="2.4.0" />
+    <PackageReference Include="FluentValidation" Version="11.11.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.0" />
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 

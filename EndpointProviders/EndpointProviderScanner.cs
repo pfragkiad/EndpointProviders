@@ -18,6 +18,7 @@ public static class EndpointProviderScanner
 
         List<IEndpointProvider> endpointsProviders = new();
 
+
         foreach (var marker in assemblyMarkers)
         {
             var types =

@@ -1,4 +1,5 @@
 ﻿using CsvReaderAdvanced;
+using CsvReaderAdvanced.Files;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -37,8 +38,11 @@ public class ExceptionMiddleware
         context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
         List<ValidationFailure> failures = new List<ValidationFailure>();
-        if (exception.InnerException is not null) failures.Add(new
-            ValidationFailure("application/json", exception.InnerException.Message));
+        if (exception.InnerException is not null)
+            failures.Add(new ValidationFailure("application/json", exception.InnerException.Message));
+
+
+        failures.Add(new ValidationFailure("application/json", exception.Message));
 
         ReaderReport readerReport = new ReaderReport()
         {
@@ -50,7 +54,7 @@ public class ExceptionMiddleware
 }
 
 public static class ExceptionMiddlewareExtensions
-{ 
+{
     public static WebApplication AddExceptionMiddleware(this WebApplication app)
     {
         app.UseMiddleware<ExceptionMiddleware>();

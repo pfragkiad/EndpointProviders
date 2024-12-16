@@ -1,9 +1,9 @@
 # EndpointProviders
-*The simplest way to add endpoints dynamically for Minimal API empowered by Dependency Injection principles.*
+*The simplest way to dynamically add endpoints in a Minimal API, leveraging Dependency Injection principles.*
 
 ## Why another one?
-Most of the libraries that target Minimal API functionality deal with instances of classes that can add Endpoints dynamically via a "marker" interface.
-What is the approach then and why this is not fully practical? Let's see an example below.
+Most libraries targeting Minimal API functionality rely on class instances of classes that can dynamically add Endpoints using a "marker" interface.
+But why is it not fully practical? Let's explore an example below.
 
 ```cs
 public class SampleWithEndPoints : IMarker
@@ -36,8 +36,8 @@ public class SampleWithEndPoints : IMarker
 app.RegisterEndPoints(typeof(App));
 ```
 
-What annoys me is that the role of the `IMarker` interface in the example above, is used only for automatic registration of all endpoints. 
-The most practical way would be to ALSO use the `IMarker` to allow Dependency Injection within the `SampleWithEndPoints` without having to write EVERY time for EACH handler the `IRepository repo`.
+What annoys me is that the role of the `IMarker` interface in the example above is limited to automatic registering all endpoints. 
+A more practical approach would be to ALSO use the `IMarker` to enable Dependency Injection within the `SampleWithEndPoints` class, avoiding the need to repeatedly declare `IRepository repo` for each handler.
 
 ## The solution: EndpointProviders!
 
@@ -55,8 +55,9 @@ dotnet add package EndpointsProviders
 
 ### How to use
 
-For this library, each class the instance of which we want to add endpoints, should derive from the `EndpointProvider` abstract class. The `EndpointProvider` inherits the `IEndpointProvider` interface.
-Each class that derives from `EndpointProvider` should override the `AddEndpoints` method. The above example should now be written as:
+For this library, every class whose instance we want to use for adding endpoints must derive from the `EndpointProvider` abstract class.
+The `EndpointProvider` itself implements the `IEndpointProvider` interface.
+Each class derived from `EndpointProvider` is required to override the `AddEndpoints` method. The example above can now be rewritten as:
 
 ```cs
 public class SampleWithEndPoints : EndpointProvider
@@ -91,7 +92,7 @@ public class SampleWithEndPoints : EndpointProvider
 }
 ```
 
-To add all endpoints from classes with the `IEndpointProvider` interface, we should use the `AddEndPointProviderFactory` before building the app, and the `AddEndpointsFromEndpointProviders` after building the app:
+To register all endpoints from classes with the `IEndpointProvider` interface, use `AddEndPointProviderFactory` before building the app and `AddEndpointsFromEndpointProviders` after building the app:
 
 ```cs
 using EndpointProviders;
@@ -112,14 +113,14 @@ WebApplication app = builder.Build();
 app.AddEndpointsFromEndpointProviders(typeof(MarkerClass));
 ```
 
-The `AndEndpointProviderFactory` method is responsible for the insertion of the endpoints.
-The `AddEndpointsFromEndpointProviders` method collects and initializes all `IEndPointProvider` objects by passing the `IServiceProvider` to their constructor.
+The `AndEndpointProviderFactory` method is responsible for inserting the endpoints.
+The `AddEndpointsFromEndpointProviders` method collects and initializes all `IEndPointProvider` objects by injecting the `IServiceProvider` into their constructors.
 
 ## Example 1 - Simple example
 
-Let's modify the classic `WeatherForecast` sample Minimal API project, in order to show an explicit example.
+Let's modify the classic `WeatherForecast` sample Minimal API project, to provide an explicit example.
 
-We slightly modify the `WeatherForecast` class to a struct as shown below (there is no specific reason for that, just my preference):
+We slightly modify the `WeatherForecast` class to a struct, as shown below (there is no particular reason for this, just my preference):
 
 ```cs
 namespace EndpointProviderTests;
@@ -136,7 +137,7 @@ public readonly struct WeatherForecast
 }
 ```
 
-Let's build now a repository that retrieves `WeatherForecast` instances:
+Now, let's build a repository that retrieves `WeatherForecast` instances:
 
 ```cs
 namespace EndpointProviderTests;
@@ -161,8 +162,8 @@ public class WeatherForecastRepository
 }
 ```
 
-Now, let's add the `EndpointProvider` that will contain the endpoints to be added to the web app. Note that we add the constructor that accepts a `IServiceProvider` argument.
-Via the passed provider we inject the repository, which is then used in common from any handler (ok, we have just one in this case).
+Now, let's add the `EndpointProvider` that will contain the endpoints to be added to the web app. Note that we include a constructor that accepts an `IServiceProvider` argument.
+Through the passed provider, we inject the repository, which can now be used by any handler (in this case, we have only one).
 
 ```cs
 using EndpointProviders;
@@ -187,7 +188,7 @@ public class WeatherForecastEndpoints : EndpointProvider
         return app;
     }
 
-    //not that we do not need to pass the repo here
+    //note that we do not need to pass the repo here
     IResult ForecastHandler(int count)
     {
         if (count <= 0)
